@@ -1,4 +1,4 @@
-# Flask JWT Auth
+# Flask Backend API service - Openstack
 
 [![Build Status]()
 
