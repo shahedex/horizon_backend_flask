@@ -1,4 +1,4 @@
-from flask import Blueprint, make_response, jsonify
+from flask import Blueprint, request, make_response, jsonify
 import requests
 import json
 import pprint
@@ -20,13 +20,15 @@ class LoginApi(MethodView):
         'projectID': ''
     }
 
-    def get(self):
-        tokenData = self.fetchUnscopedToken(self.base_url)
+    def post(self):
+        email = request.json['email']
+        password = request.json['password']
+        tokenData = self.fetchUnscopedToken(self.base_url, email, password)
         if tokens['responseStatus'] == 'ok':
             LoginApi.fetchOwnProjects(self.base_url, tokenData, tokens['unScopedToken'])
         responseObject = {
             'status': 'success',
-            'message': 'This is a successful call',
+            'projectID': tokens['projectID'],
             'unScopedToken': tokens['unScopedToken'],
             'scopedToken': tokens['scopedToken']
         }
@@ -35,18 +37,18 @@ class LoginApi(MethodView):
         return make_response(jsonify({'error': 'There has been a problem. Please try again!'}))
 
     @staticmethod
-    def fetchUnscopedToken(url):
+    def fetchUnscopedToken(url, email, password):
         auth = {
             'auth': {
                 'identity': {
                     'methods': ['password'],
                     'password': {
                         'user': {
-                            'name': 'shajal',
+                            'name': email,
                             'domain': {
                                 'name': 'Default'
                             },
-                            'password': 'Sh0!l-9Ep3lk#1'
+                            'password': password
                         },
 
                     }
@@ -98,7 +100,7 @@ class LoginApi(MethodView):
 
 LoginApi_view = LoginApi.as_view('login_api')
 auth_blueprint.add_url_rule(
-    '/login',
+    '/api/login',
     view_func=LoginApi_view,
-    methods=['GET']
+    methods=['POST']
     )

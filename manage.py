@@ -5,7 +5,7 @@ import os
 import unittest
 import coverage
 
-from flask_script import Manager
+from flask_script import Server, Manager
 from flask_migrate import Migrate, MigrateCommand
 
 COV = coverage.coverage(
@@ -69,6 +69,7 @@ def cov():
 #     """Drops the db tables."""
 #     db.drop_all()
 
+manager.add_command("runserver", Server(host="0.0.0.0", port=5000))
 
 if __name__ == '__main__':
     manager.run()
